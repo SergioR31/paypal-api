@@ -1,0 +1,164 @@
+<section id="fh5co-home" data-section="home" style="background-image: url(images/full_image_2.jpg);" data-stellar-background-ratio="0.5">
+	<div class="gradient"></div>
+		<div class="container">
+			<div class="text-wrap">
+				<div class="text-inner">
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<h1 class="to-animate">Realiza tu pago</a></h1>
+                            <h2 class="to-animate">{{curso}}</h2>
+                            <h2 class="to-animate">{{precio}}</h2>
+
+                            
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<div class="slant"></div>
+</section>
+
+
+<section id="fh5co-contact" data-section="contact" style="margin-bottom: 50px">
+  <div class="container">
+    <div class="row">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">Cliente</a></li>
+        <li><a data-toggle="tab" href="#direccion">Direccion</a></li>
+        <li><a data-toggle="tab" href="#menu2">Pago</a></li>
+      </ul>
+      
+      <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+          <div class="col-md-12">
+				    <h3>Ingresa tus datos</h3>
+            <div class="col-md-6">
+					    <div class="form-group ">
+						    <label for="name" class="sr-only">Nombre</label>
+						    <input id="name" name="name" class="form-control" placeholder="Nombre" type="text">
+					    </div>
+
+					    <div class="form-group ">
+						    <label for="email" class="sr-only">Email</label>
+						    <input id="email" name="email" class="form-control" placeholder="Email" type="email">
+					    </div>
+
+              <div class="form-group ">
+						    <label for="company" class="sr-only">Compañia</label>
+						    <input id="company" name="company" class="form-control" placeholder="Compañia" type="text">
+					    </div>
+            </div>
+            <div class="col-md-6">
+					    <div class="form-group ">
+						    <label for="lastName" class="sr-only">Apellido(s)</label>
+						    <input id="lastName" name="lastName" class="form-control" placeholder="Apellido(s)" type="text">
+					    </div>
+					    <div class="form-group ">
+						    <label for="phone" class="sr-only">Telefono</label>
+						    <input id="phone" name="phone" class="form-control" placeholder="Telefono" type="phone">
+					    </div>
+            </div>
+			    </div>
+        </div>
+
+        <div id="direccion" class="tab-pane fade">
+          <div class="col-md-12">
+				    <h3>Ingresa tu direccion</h3>
+            <div class="col-md-6">
+					    <div class="form-group ">
+						    <label for="calle" class="sr-only">Calle</label>
+						    <input id="calle" name="calle" class="form-control" placeholder="Calle" type="text">
+					    </div>
+
+					    <div class="form-group ">
+						    <label for="municipio" class="sr-only">Municipio</label>
+						    <input id="municipio" name="municipio" class="form-control" placeholder="Municipio" type="text">
+					    </div>
+
+              <div class="form-group ">
+						    <label for="pais" class="sr-only">Pais</label>
+						    <input id="pais" name="pais" class="form-control" placeholder="Pais" type="text">
+					    </div>
+
+            </div>
+            <div class="col-md-6">
+					    <div class="form-group ">
+						    <label for="colonia" class="sr-only">Colonia</label>
+						    <input id="colonia" name="colonia" class="form-control" placeholder="Colonia" type="text">
+					    </div>
+
+					    <div class="form-group ">
+						    <label for="estado" class="sr-only">Estado</label>
+						    <input id="estado" name="estado" class="form-control" placeholder="Estado" type="text">
+					    </div>
+
+              <div class="form-group ">
+						    <label for="codigo-postal" class="sr-only">Codigo Postal</label>
+						    <input id="codigo-postal" name="codigo-postal" class="form-control" placeholder="Codigo Postal" type="text">
+					    </div>
+            </div>
+			    </div>
+        </div>
+
+        <div id="menu2" class="tab-pane fade">
+          <div id="dropin-wrapper">
+            <div id="checkout-message"></div>
+            <div id="dropin-container"></div>
+            <button id="submit-button" class="btn btn-primary">Pagar</button>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+</section>
+
+
+
+<script>
+
+    var str = '{{precio}}';
+    var precioStr = str.split("$")[1];
+    var miles = precioStr.split(",")[0];
+    var cientos = precioStr.split(",")[1];
+    var precio = Number(miles + cientos);
+
+  var button = document.querySelector('#submit-button');
+
+  braintree.dropin.create({
+    // Insert your tokenization key here
+    authorization: 'sandbox_ykz96q83_dgcp86fqrbmb2ddw',
+    container: '#dropin-container'
+  }, function (createErr, instance) {
+    button.addEventListener('click', function () {
+      instance.requestPaymentMethod(function (requestPaymentMethodErr, payload) {
+        // When the user clicks on the 'Submit payment' button this code will send the
+        // encrypted payment information in a variable called a payment method nonce
+        $.ajax({
+          type: 'POST',
+          url: '/checkout',
+          data: {'paymentMethodNonce': payload.nonce,
+                    'amount': precio
+          }
+        }).done(function(result) {
+          // Tear down the Drop-in UI
+          instance.teardown(function (teardownErr) {
+            if (teardownErr) {
+              console.error('Could not tear down Drop-in UI!');
+            } else {
+              console.info('Drop-in UI has been torn down!');
+              // Remove the 'Submit payment' button
+              $('#submit-button').remove();
+            }
+          });
+
+          if (result.success) {
+            $('#checkout-message').html('<h1>Success</h1><p>Your Drop-in UI is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p>');
+          } else {
+            console.log(result);
+            $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+          }
+        });
+      });
+    });
+  });
+</script>
