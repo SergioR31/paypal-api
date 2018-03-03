@@ -17,11 +17,12 @@ router.post('/', function(req, res, next) {
   //Get the value from amount
   var precio = req.body.amount;
 
-  // var nombre = req.body.name;
-  // var apellido = req.body.lastName;
-  // var compania = req.body.company;
-  // var telefono = req.body.phone;
-  // var mail = req.body.email;
+  var nombre = req.body.name;
+  var apellido = req.body.lastName;
+  var compania = req.body.company;
+  var telefono = req.body.phone;
+  var mail = req.body.email;
+
   // var calle = req.body.calle;
   // var municipio = req.body.municipio;
   // var colonia = req.body.colonia;
@@ -32,13 +33,13 @@ router.post('/', function(req, res, next) {
   var newTransaction = gateway.transaction.sale({
     amount: precio,
 
-    // customer: {
-    //   firstName: nombre,
-    //   lastName:  apellido,
-    //   company: compania,
-    //   phone: telefono,
-    //   email: mail
-    // },
+    customer: {
+      firstName: nombre,
+      lastName:  apellido,
+      company: compania,
+      phone: telefono,
+      email: mail
+    },
     
     // billing: {
     //   firstName: nombre,

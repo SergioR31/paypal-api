@@ -124,6 +124,12 @@
 
   var button = document.querySelector('#submit-button');
 
+  var nombre = document.getElementById('name');
+  var lastName = document.getElementById('lastName');
+  var email = document.getElementById('email');
+  var phone = document.getElementById('phone');
+  var company = document.getElementById('company');
+
   braintree.dropin.create({
     // Insert your tokenization key here
     authorization: 'sandbox_ykz96q83_dgcp86fqrbmb2ddw',
@@ -137,7 +143,12 @@
           type: 'POST',
           url: '/checkout',
           data: {'paymentMethodNonce': payload.nonce,
-                    'amount': precio
+                    'amount': precio,
+                    'name': nombre.value,
+                    'lastName': lastName.value,
+                    'email': email.value,
+                    'phone': phone.value,
+                    'company': company.value
           }
         }).done(function(result) {
           // Tear down the Drop-in UI
