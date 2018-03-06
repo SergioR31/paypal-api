@@ -112,7 +112,7 @@
     </div>
 </section>
 
-
+<form action="/" method="GET" id="form-index"></form>
 
 <script>
 
@@ -121,6 +121,7 @@
     var miles = precioStr.split(",")[0];
     var cientos = precioStr.split(",")[1];
     var precio = Number(miles + cientos);
+    var curso = '{{curso}}';
 
   var button = document.querySelector('#submit-button');
 
@@ -163,9 +164,36 @@
           });
 
           if (result.success) {
-            $('#checkout-message').html('<h1>Success</h1><p>Your Drop-in UI is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p>');
+            $('#checkout-message').html('<h1>Exito</h1><p>Operacion realizada con exito! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Se esta redireccionando a la pagina principal....</p>');
+
+            $.ajax({
+              type: 'POST', 
+              url: '/sendMail',
+              data: {
+                'precio': precio,
+                'curso': curso,
+                'to': email.value,
+                'name': nombre.value,
+                'lastName': lastName.value,
+                'phone': phone.value,
+                'company': company.value
+              }
+            }).done(function(error) {
+              if(error){
+                console.info('Segun que si se envio el email.');
+
+                $("#form-index").submit();
+
+
+              } else {
+                console.error('No sirvio de nada');
+              }
+
+            });
+
           } else {
             console.log(result);
+
             $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
           }
         });
